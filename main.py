@@ -15,6 +15,8 @@ class MainGame():
     ETank_num = 5
     ETank_count = 5
 
+    Bullet_list = []
+
     def __init__(self):
         pass
 
@@ -36,6 +38,9 @@ class MainGame():
             self.blitETank()
             if MainGame.Tank_1 and not MainGame.Tank_1.press:
                 MainGame.Tank_1.move()
+
+            self.blitBullet()
+
             time.sleep(0.005)
             pygame.display.update()
 
@@ -51,6 +56,12 @@ class MainGame():
         for ETank in MainGame.ETank_List:
             ETank.display()
             ETank.randMove()
+
+    def blitBullet(self):
+        for Bullet in MainGame.Bullet_list:
+            Bullet.Display()
+            Bullet.bullmove()
+
 
     def get_events(self):
         event_list = pygame.event.get()
@@ -81,6 +92,10 @@ class MainGame():
                     MainGame.Tank_1.move()
                 elif event.key == pygame.K_SPACE:
                     print("Shoot")
+                    m = Bullet(MainGame.Tank_1)
+
+                    MainGame.Bullet_list.append(m)
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     MainGame.Tank_1.press = True
@@ -96,7 +111,6 @@ class MainGame():
         print("Ended")
         pygame.quit()
         exit()
-
 class Tanks():
     def __init__(self,left,top):
         self.images = {
@@ -206,33 +220,58 @@ class Enemytank(Tanks):
                 self.rect.top += self.speed
 
     def shoot(self):
-        pass
-
+        return Bullet(self)
 class Bullet():
-    def __init__(self):
-        self.image = pygame.image.load("Images/bullet U.png")
+    def __init__(self, Tanks):
+        self.image = pygame.image.load("Images/bullet D.png")
         self.direction = Tanks.direction
 
-        self.direction = self.image.get_rect()
+        self.rect = self.image.get_rect()
 
         self.speed = 7
 
         if self.direction == 'U':
-            pass
+            self.rect.left = Tanks.rect.left + Tanks.rect.width/2 - self.rect.width/2
+            self.rect.top = Tanks.rect.top - self.rect.height
+
         elif self.direction == 'L':
-            pass
+            self.rect.left = Tanks.rect.left - self.rect.width
+            self.rect.top = Tanks.rect.top + Tanks.rect.height/2 - self.rect.height/2
+
         elif self.direction == 'R':
-            pass
+            self.rect.left = Tanks.rect.left + Tanks.rect.width
+            self.rect.top = Tanks.rect.top + Tanks.rect.height/2 - self.rect.height/2
+
         elif self.direction == 'D':
-            pass
-        
+            self.rect.left = Tanks.rect.left + Tanks.rect.width/2 - self.rect.width/2
+            self.rect.top = Tanks.rect.top + Tanks.rect.height
 
+    def bullmove(self):
+        if self.direction == 'U':
+            if self.rect.top > 0:
+                self.rect.top -= self.speed
 
-    def move(self):
-        pass
+            else:
+                pass
 
+        elif self.direction == 'L':
+            if self.rect.left > 0:
+                self.rect.left -= self.speed
+            else:
+                pass
+
+        elif self.direction == 'R':
+            if self.rect.left < MainGame.SCREEN_WIDTH - self.rect.width:
+                self.rect.left += self.speed
+            else:
+                pass
+        elif self.direction == 'D':
+            if self.rect.top < MainGame.SCREEN_HEIGHT - self.rect.height:
+                self.rect.top += self.speed
+            else:
+                pass
     def Display(self):
-        pass
+        MainGame.window.blit(self.image, self.rect)
 
 
 class Explosion():
